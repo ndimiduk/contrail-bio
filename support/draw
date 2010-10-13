@@ -1,0 +1,46 @@
+#!/bin/sh
+
+if [ $# -lt 1 ]
+then
+  echo "draw.sh graph.txt [node] [hops]"
+  exit
+fi
+
+file=$1
+shift
+
+dir=`dirname $0`
+
+if [ $# -gt 0 ]
+then
+   node=$1
+   shift
+
+   if [ $# -gt 0 ]
+   then
+     hops=$1
+     dest=$2
+     $dir/extract_neighborhood.pl $file $node $hops $dest > ${hops}hop
+     file=${hops}hop
+   fi
+   
+   echo "Rendering $file";
+   $dir/graph2dot.pl $file -tag $node > $file.dot
+else
+  echo "Rendering $file";
+  $dir/graph2dot.pl $file $* > $file.dot
+fi
+
+
+if [ `uname -s` == "Linux" ]
+then
+  #dot -Tps $file.dot -o $file.ps >& /dev/null
+  #fdp -Tps $file.dot -o $file.ps
+  neato -Goverlap=scale -Tps $file.dot -o $file.ps >& /dev/null
+  #neato -Goverlap=scale -Gstart=rand -Tps $file.dot -o $file.ps
+  #neato -Gsplines=true -Tps $file.dot -o $file.ps
+  #neato -Gstart=rand -Tps $file.dot -o $file.ps
+else
+  #dot -Tpdf $file.dot -o $file.pdf
+  neato -Goverlap=scale -Tpdf $file.dot -o $file.pdf
+fi

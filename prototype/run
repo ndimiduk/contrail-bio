@@ -1,0 +1,52 @@
+#!/bin/sh
+
+if [ $# -lt 1 ]
+then
+  echo "run 100 10000 non"
+  exit
+fi
+
+file=$1
+shift
+
+if [ $file == "all" ]
+then
+  ./run bubbletest; echo "expected 1x630";   read
+  ./run cycle;      echo "expected 1x6";     read
+  ./run non;        echo "expected 2x94";    read
+  ./run 100;        echo "expected 1x135";   read
+  ./run 10k;        echo "expected 1x10035"; read
+  ./run d1.10k;     echo "expected 59x6951"; 
+elif [ $file == "bubbletest" ]
+then
+  ./contrail.pl ../data/bubbletest.sfa 25 $*
+elif [ $file == "tandem" ]
+then
+  ./contrail.pl ../data/tandem.sfa 3 $*
+elif [ $file == "cycle" ]
+then
+  ./contrail.pl ../data/cycle.sfa 3 $*
+elif [ $file == "d1.100k" ]
+then
+  ./contrail.pl ../data/d1.100k.fa 25 $*
+elif [ $file == "d1.10k" ]
+then
+  ./contrail.pl ../data/d1.10k.fa 17 $*
+elif [ $file == "non" ]
+then
+  ./contrail.pl -work non -reads ../data/nonoverlap.sfa 25 -adv MINTHREADWEIGHT=1 -adv MAX_LOW_COV_THRESH=1 $*
+elif [ $file == "arbrc" ]
+then
+  ./contrail.pl -reads ../data/arbrc.36.sfa 25 -work arbrc -insert 100 -unique 30 $*
+elif [ $file == "arbrcrd" ]
+then
+  ./contrail.pl -reads ../data/arbrcrd.36.sfa 25 -work arbrcrd -insert 100 -unique 30 $*
+elif [ $file == "arbrcrd.2" ]
+then
+  ./contrail.pl -reads ../data/arbrcrd.36.250.sfa 25 -work arbrcrd.2 -insert 250 -unique 30 $*
+elif [ $file == "2M" ]
+then
+  ./contrail.pl -reads /fs/szattic-asmg4/mschatz/Contrail/E.coli/all.2M.sfa 25 -work 2M $*
+else
+  ./contrail.pl -work $file -reads ../data/B.anthracis.36.$file.sfa 21 $*
+fi
